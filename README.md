@@ -1,61 +1,162 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+# TeamTalk
 </p>
 
-## About Laravel
+# TeamTalk
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Sistema de chat e colaboração em tempo real construído com Laravel 12, utilizando autenticação robusta, controle de permissões e interface moderna.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Stack Utilizada
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel 12+
+- Jetstream (Livewire)
+- Livewire
+- Broadcasting com Reverb
+- Tailwind CSS + DaisyUI
+- Spatie Laravel Permission (gestão de papéis/permissões)
+- Spatie Activity Log (log de atividades de usuários)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Instalação
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Clonar o projeto
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+git clone git@github-inovcorp:SaraCInovCorp/teamtalk.git
+cd teamtalk
 
-## Laravel Sponsors
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Instalar dependências PHP
 
-### Premium Partners
+```
+composer install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
 
-## Contributing
+### 3. Instalar dependências Node.js
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+npm install
+npm run dev
+```
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Configurar variáveis de ambiente
 
-## Security Vulnerabilities
+```
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Editar .env para dados do banco e broadcasting**
 
-## License
+```
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+### 5. Rodar migrations
+
+```
+php artisan migrate
+```
+
+---
+
+## Autenticação
+
+Usa Jetstream com Livewire, oferecendo registro, login, gestão de perfil e funcionalidades modernas.
+
+---
+
+## Broadcasting (Reverb)
+
+Para chat em tempo real/outras features:
+
+```
+php artisan install:broadcasting --reverb
+```
+
+**Confirme a instalação dos pacotes JS ao ser perguntado (yes)**
+
+```
+npm install
+npm run dev
+php artisan reverb:start
+```
+
+
+No `.env`:
+
+```
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=...
+REVERB_APP_KEY=...
+REVERB_APP_SECRET=...
+```
+
+---
+
+## Permissões (Roles)
+
+Instale e publique migrations do Spatie Permission:
+
+```
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+```
+
+---
+
+## Log de Atividades
+
+Instale e publique migrations do Spatie Activity Log:
+
+```
+composer require spatie/laravel-activitylog
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
+php artisan migrate
+```
+
+Se quiser customizar a config:
+
+```
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-config"
+```
+
+---
+
+## Frontend
+
+- TailwindCSS e DaisyUI prontos.
+- Em `tailwind.config.js`:  
+  Adicione o DaisyUI ao array de plugins.
+
+```
+plugins: [forms, typography, require('daisyui')],
+```
+
+---
+
+## Comandos Úteis
+
+```
+php artisan serve # Servidor local
+php artisan reverb:start # Iniciar servidor websocket
+npm run dev # Compilar assets
+```
+
+---
+
+## Dicas
+
+- Separe development em branches: main (produção), dev (estável/testes).
+- Tenha Livewire e scripts de broadcasting no seu layout Blade.
+
+---
+
+
