@@ -17,6 +17,7 @@ Sistema de chat e colaboração em tempo real construído com Laravel 12, utiliz
 - Tailwind CSS + DaisyUI
 - Spatie Laravel Permission (gestão de papéis/permissões)
 - Spatie Activity Log (log de atividades de usuários)
+- Pest PHP (framework de testes elegante para PHP)
 
 ---
 
@@ -139,6 +140,43 @@ php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProv
 ```
 plugins: [forms, typography, require('daisyui')],
 ```
+
+---
+
+## Testes automatizados com Pest
+
+Este projeto utiliza **Pest** para toda a suite de testes, proporcionando sintaxe mais expressiva e execução simplificada.
+
+### Rodar os testes
+
+```
+php artisan test
+```
+
+ou
+
+```
+./vendor/bin/pest
+```
+
+
+### Como instalar e configurar o Pest (caso venha de um fork sem o Pest)
+
+```
+composer remove phpunit/phpunit
+composer require pestphp/pest --dev --with-all-dependencies
+./vendor/bin/pest --init
+```
+
+
+### Como converter testes PHPUnit existentes para Pest
+
+```
+composer require pestphp/pest-plugin-drift --dev
+./vendor/bin/pest --drift
+```
+
+O comando acima converte seus testes de PHPUnit para a sintaxe Pest automaticamente.
 
 ---
 
