@@ -2,22 +2,45 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Room;
+use App\Models\Message;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
+    public function run()
     {
-        // User::factory(10)->create();
+        
+        User::factory()->count(3)->create([
+            'role' => 'admin'
+        ])->each(function ($user) {
+            $rooms = Room::factory(rand(1, 3))->create(['created_by' => $user->id]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+            foreach ($rooms as $room) {
+                $room->users()->attach($user->id, ['role_in_room' => 'admin', 'joined_at' => now()]);
+
+                Message::factory(rand(5, 10))->create([
+                    'room_id' => $room->id,
+                    'sender_id' => $user->id,
+                ]);
+            }
+        });
+
+        
+        User::factory()->count(7)->create([
+            'role' => 'user'
+        ])->each(function ($user) {
+            $rooms = Room::inRandomOrder()->take(rand(1, 2))->get();
+
+            foreach ($rooms as $room) {
+                $room->users()->attach($user->id, ['role_in_room' => 'member', 'joined_at' => now()]);
+
+                Message::factory(rand(1, 5))->create([
+                    'room_id' => $room->id,
+                    'sender_id' => $user->id,
+                ]);
+            }
+        });
     }
 }

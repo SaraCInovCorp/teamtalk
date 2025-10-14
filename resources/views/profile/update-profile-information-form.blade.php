@@ -81,6 +81,40 @@
                 @endif
             @endif
         </div>
+
+        <!-- Avatar -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="avatar" value="{{ __('Avatar URL') }}" />
+            <x-input id="avatar" type="text" class="mt-1 block w-full" wire:model="state.avatar" autocomplete="avatar" />
+            <x-input-error for="avatar" class="mt-2" />
+        </div>
+
+        <!-- Bio -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="bio" value="{{ __('Bio') }}" />
+            <textarea id="bio" class="mt-1 block w-full" wire:model="state.bio" rows="3"></textarea>
+            <x-input-error for="bio" class="mt-2" />
+        </div>
+
+        <!-- Status Message -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="status_message" value="{{ __('Status Message') }}" />
+            <x-input id="status_message" type="text" class="mt-1 block w-full" wire:model="state.status_message" autocomplete="status_message" />
+            <x-input-error for="status_message" class="mt-2" />
+        </div>
+
+        <!-- Last Seen At (Somente leitura ou oculto normalmente, exiba só se for útil ao usuário) -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="last_seen_at" value="{{ __('Última atividade') }}" />
+            <x-input id="last_seen_at" type="text" class="mt-1 block w-full bg-gray-100" value="{{ optional($this->user->last_seen_at)->format('d/m/Y H:i') }}" disabled />
+        </div>
+
+        <!-- Is Active (switch ou select, exemplo simples como checkbox) -->
+        <div class="col-span-6 sm:col-span-4 flex items-center gap-2">
+            <input id="is_active" type="checkbox" wire:model="state.is_active" />
+            <x-label for="is_active" value="{{ __('Ativo') }}" />
+            <x-input-error for="is_active" class="mt-2" />
+        </div>
     </x-slot>
 
     <x-slot name="actions">

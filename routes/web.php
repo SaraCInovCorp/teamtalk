@@ -2,13 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome')->name('home');
 
 Route::get('/chat', function () {
     return view('chat');
 });
+Route::view('/faq', 'faq')->name('faq');
 
 
 Route::middleware([

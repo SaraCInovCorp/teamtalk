@@ -17,6 +17,25 @@ Sistema de chat e colaboração em tempo real construído com Laravel 12, utiliz
 
 ---
 
+## Estrutura do Banco de Dados
+
+### Tabelas principais
+
+- **users:** usuários do sistema, com campos de avatar, nome, email, estado, e relação com a tabela de permissões.
+- **roles** e **permissions:** controladas pelo pacote Spatie para definição de papéis (Admin, User) e permissões associadas.
+- **rooms:** salas de chat criadas, com avatar, nome e criador.
+- **room_user:** tabela pivô ligando usuários às salas, com papel em cada sala (membro, admin).
+- **messages:** mensagens enviadas, relacionando sala (nullable para mensagens privadas), remetente, receptor (opcional para mensagens diretas), conteúdo, anexo, status de leitura e timestamps.
+
+### Relações importantes e fluxo
+
+- Usuários são atribuídos a papéis e permissões (ex: admins podem criar/gerir salas).
+- Usuários podem pertencer a várias salas (room_user), com controles de papel.
+- Mensagens podem ser públicas (em salas) ou privadas (entre usuários).
+- Log de atividades registra eventos importantes (logins, mensagens, ações administrativas).
+
+---
+
 ## Instalação
 
 ### 1. Clonar o projeto
