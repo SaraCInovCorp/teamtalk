@@ -1,8 +1,10 @@
 <x-guest-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Confirma Password') }}
+        </h2>
+    </x-slot>
     <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
 
         <div class="mb-4 text-sm text-gray-600">
             {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
@@ -20,7 +22,7 @@
 
             <div class="flex justify-end mt-4">
                 <x-button class="ms-4">
-                    {{ __('Confirm') }}
+                    {{ __('Confirma') }}
                 </x-button>
             </div>
         </form>

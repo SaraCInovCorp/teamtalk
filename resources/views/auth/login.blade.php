@@ -1,7 +1,10 @@
 <x-guest-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Log In') }}
+        </h2>
+    </x-slot>
     <x-authentication-card>
-        
-
         <x-validation-errors class="mb-4" />
 
         @session('status')

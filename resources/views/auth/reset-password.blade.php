@@ -1,8 +1,10 @@
 <x-guest-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Redefinir senha') }}
+        </h2>
+    </x-slot>
     <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
 
         <x-validation-errors class="mb-4" />
 
@@ -28,7 +30,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <x-button>
-                    {{ __('Reset Password') }}
+                    {{ __('Redefinir senha') }}
                 </x-button>
             </div>
         </form>

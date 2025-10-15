@@ -11,7 +11,6 @@ Sistema de chat e colaboração em tempo real construído com Laravel 12, utiliz
 - Livewire
 - Broadcasting com Reverb
 - Tailwind CSS + DaisyUI
-- Spatie Laravel Permission (gestão de papéis/permissões)
 - Spatie Activity Log (log de atividades de usuários)
 - Pest PHP (framework de testes elegante para PHP)
 
@@ -21,15 +20,14 @@ Sistema de chat e colaboração em tempo real construído com Laravel 12, utiliz
 
 ### Tabelas principais
 
-- **users:** usuários do sistema, com campos de avatar, nome, email, estado, e relação com a tabela de permissões.
-- **roles** e **permissions:** controladas pelo pacote Spatie para definição de papéis (Admin, User) e permissões associadas.
+- **users:** usuários do sistema, com campos de avatar, nome, email, estado, biografia, role (definido como string: 'admin' ou 'user') e mais.
 - **rooms:** salas de chat criadas, com avatar, nome e criador.
 - **room_user:** tabela pivô ligando usuários às salas, com papel em cada sala (membro, admin).
 - **messages:** mensagens enviadas, relacionando sala (nullable para mensagens privadas), remetente, receptor (opcional para mensagens diretas), conteúdo, anexo, status de leitura e timestamps.
 
 ### Relações importantes e fluxo
 
-- Usuários são atribuídos a papéis e permissões (ex: admins podem criar/gerir salas).
+- Usuários têm o papel (role) diretamente no campo role da tabela users (ex: 'admin', 'user').
 - Usuários podem pertencer a várias salas (room_user), com controles de papel.
 - Mensagens podem ser públicas (em salas) ou privadas (entre usuários).
 - Log de atividades registra eventos importantes (logins, mensagens, ações administrativas).
@@ -118,15 +116,22 @@ REVERB_APP_SECRET=...
 
 ## Permissões (Roles)
 
-Instale e publique migrations do Spatie Permission:
+**Gestão de papéis sem Spatie Permission**:  
+- O sistema usa o campo `role` na tabela `users` para identificar se o usuário é admin, user, guest etc.
+- Controle de acesso e políticas são definidos diretamente em controllers, policies ou middlewares do Laravel:
 
 ```
-composer require spatie/laravel-permission
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
-php artisan migrate
+// Exemplo de method policy sem Spatie
+public function update(User $user, Room $room)
+{
+return $user->role === 'admin';
+}
 ```
+
+- Basta utilizar os métodos auxiliares no Model User, como `isAdmin()` ou via `Gate`.
 
 ---
+
 
 ## Log de Atividades
 
@@ -207,7 +212,7 @@ npm run dev # Compilar assets
 
 ## Dicas
 
-- Separe development em branches: main (produção), dev (estável/testes).
+- Separe development em branches: main (produção), dev (testes).
 - Tenha Livewire e scripts de broadcasting no seu layout Blade.
 
 ---

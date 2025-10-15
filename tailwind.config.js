@@ -18,6 +18,9 @@ export default {
             },
             colors: {
                 'teamtalk-blue': '#134c96',
+                'teamtalk-blue-claro': '#249fda',
+                'teamtalk-green': '#3e802f',
+                'teamtalk-green-claro': '#559e35',
             },
         },
     },

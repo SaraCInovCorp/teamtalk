@@ -1,32 +1,60 @@
 <x-guest-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Registo') }}
+        </h2>
+    </x-slot>
     <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
-
         <x-validation-errors class="mb-4" />
-
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
+            <!-- Name -->
             <div>
                 <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <x-input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
+            <!-- Email -->
             <div class="mt-4">
                 <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                <x-input id="email" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
+            <!-- Password -->
             <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <x-input id="password" type="password" name="password" required autocomplete="new-password" />
             </div>
 
+            <!-- Confirmação password -->
             <div class="mt-4">
                 <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" />
+            </div>
+
+            <!-- Foto do perfil -->
+            <div class="mt-4">
+                <x-label for="profile_photo" value="Foto de perfil" />
+                <x-input id="profile_photo" type="file" name="profile_photo" accept="image/png,image/jpeg,image/jpg" />
+            </div>
+            
+            <!-- Avatar -->
+            <div class="mt-4">
+                <x-label for="avatar" value="Avatar" />
+                <x-input id="avatar" type="file" name="avatar" accept="image/*" />
+            </div>
+
+            <!-- Bio -->
+            <div class="mt-4">
+                <x-label for="bio" value="Bio" />
+                <x-text-area id="bio" name="bio" rows="2">{{ old('bio') }}</x-text-area>
+            </div>
+
+            <!-- Status Message -->
+            <div class="mt-4">
+                <x-label for="status_message" value="Status" />
+                <x-input id="status_message" type="text" name="status_message" :value="old('status_message')" autocomplete="status_message" />
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
