@@ -243,7 +243,7 @@ npm run dev # Compilar assets
   - `main` para produção.
   - `dev` para testes internos.
 - Mantenha o layout base com Livewire e scripts de broadcasting ativos.
-- Utilize componentes Blade reutilizáveis (~btn, input, checkbox, label~) para consistência visual e produtividade. 
+- Utilize componentes Blade reutilizáveis (btn, input, checkbox, label) para consistência visual e produtividade. 
 
 ---
 
