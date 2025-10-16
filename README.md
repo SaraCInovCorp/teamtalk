@@ -1,8 +1,12 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center">
+  <a href="#">
+    <img src="public/logo.png" width="400" alt="TeamTalk Logo">
+  </a>
+</p>
 
 # TeamTalk
 
-Sistema de chat e colaboração em tempo real construído com Laravel 12, utilizando autenticação robusta, controle de permissões e interface moderna.
+Sistema de chat e colaboração em tempo real construído com **Laravel 12**, oferecendo autenticação robusta, controle de papéis dinâmicos e interface moderna e responsiva.
 
 ## Stack Utilizada
 
@@ -20,17 +24,25 @@ Sistema de chat e colaboração em tempo real construído com Laravel 12, utiliz
 
 ### Tabelas principais
 
-- **users:** usuários do sistema, com campos de avatar, nome, email, estado, biografia, role (definido como string: 'admin' ou 'user') e mais.
+- **users:** usuários do sistema, com os seguintes campos:
+  - `name`, `email`, `password`
+  - `role` (string: *admin* | *user*)
+  - `avatar` (foto de usuário)
+  - `profile_photo_path` (foto de perfil do Jetstream)
+  - `bio` (biografia curta)
+  - `status_message` (mensagem de status exibida no chat)
+  - `is_active` (flag para indicar se o usuário está ativo no sistema)
+  - `last_seen_at` (último momento online)
 - **rooms:** salas de chat criadas, com avatar, nome e criador.
-- **room_user:** tabela pivô ligando usuários às salas, com papel em cada sala (membro, admin).
-- **messages:** mensagens enviadas, relacionando sala (nullable para mensagens privadas), remetente, receptor (opcional para mensagens diretas), conteúdo, anexo, status de leitura e timestamps.
+- **room_user:** tabela pivô relacionando usuários às salas, com o papel respectivo (membro ou admin).
+- **messages:** registro de mensagens, podendo referenciar uma sala (mensagens públicas) ou destinatário (mensagens privadas).
 
 ### Relações importantes e fluxo
 
-- Usuários têm o papel (role) diretamente no campo role da tabela users (ex: 'admin', 'user').
-- Usuários podem pertencer a várias salas (room_user), com controles de papel.
-- Mensagens podem ser públicas (em salas) ou privadas (entre usuários).
-- Log de atividades registra eventos importantes (logins, mensagens, ações administrativas).
+- Usuários têm papéis definidos diretamente na tabela `users` via campo `role`.
+- Cada usuário pode participar de múltiplas salas via tabela intermediária `room_user`.
+- Mensagens privadas e de grupo coexistem na tabela `messages`.
+- Logs de atividades (implementados via **Spatie Activity Log**) registram eventos importantes como logins e envio de mensagens.
 
 ---
 
@@ -80,9 +92,22 @@ php artisan migrate
 
 ---
 
-## Autenticação
+## Autenticação e Registro
 
-Usa Jetstream com Livewire, oferecendo registro, login, gestão de perfil e funcionalidades modernas.
+O sistema usa **Laravel Jetstream com Livewire**, permitindo:
+- Registro e login completo.
+- Upload de **foto de perfil** (`profile_photo`) e **avatar** durante o cadastro.
+- Campos customizados: *bio*, *status_message* e flag `is_active`.
+
+As imagens são armazenadas em:
+- `storage/app/public/avatars`
+- `storage/app/public/profile-photos`
+
+Para torná-las acessíveis publicamente:
+
+```
+php artisan storage:link
+```
 
 ---
 
@@ -114,26 +139,23 @@ REVERB_APP_SECRET=...
 
 ---
 
-## Permissões (Roles)
+## Papéis e Permissões
 
-**Gestão de papéis sem Spatie Permission**:  
-- O sistema usa o campo `role` na tabela `users` para identificar se o usuário é admin, user, guest etc.
-- Controle de acesso e políticas são definidos diretamente em controllers, policies ou middlewares do Laravel:
+- Papéis são definidos no campo `role` de `users`.
+- Controle de acesso é feito por **Policies** e **Gates** padrão do Laravel.
+
+Exemplo:
 
 ```
-// Exemplo de method policy sem Spatie
 public function update(User $user, Room $room)
 {
 return $user->role === 'admin';
 }
 ```
 
-- Basta utilizar os métodos auxiliares no Model User, como `isAdmin()` ou via `Gate`.
-
 ---
 
-
-## Log de Atividades
+## Log de Atividades (Audit Trail)
 
 Instale e publique migrations do Spatie Activity Log:
 
@@ -151,7 +173,7 @@ php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProv
 
 ---
 
-## Frontend
+## Frontend e UI
 
 - TailwindCSS e DaisyUI prontos.
 - Em `tailwind.config.js`:  
@@ -160,6 +182,10 @@ php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProv
 ```
 plugins: [forms, typography, require('daisyui')],
 ```
+
+Inclui também:
+- **Componentes Blade personalizados** para botões, inputs, labels flutuantes e checkboxes.
+- **Design responsivo** utilizando padrões utilitários do Tailwind.
 
 ---
 
@@ -203,18 +229,22 @@ O comando acima converte seus testes de PHPUnit para a sintaxe Pest automaticame
 ## Comandos Úteis
 
 ```
-php artisan serve # Servidor local
+php artisan serve # Servidor local 
+//Se não estiver utilizando o Herd
 php artisan reverb:start # Iniciar servidor websocket
 npm run dev # Compilar assets
 ```
 
 ---
 
-## Dicas
+## Dicas  de Desenvolvimento
 
-- Separe development em branches: main (produção), dev (testes).
-- Tenha Livewire e scripts de broadcasting no seu layout Blade.
+- Crie branches separadas para desenvolvimento:
+  - `main` para produção.
+  - `dev` para testes internos.
+- Mantenha o layout base com Livewire e scripts de broadcasting ativos.
+- Utilize componentes Blade reutilizáveis (~btn, input, checkbox, label~) para consistência visual e produtividade. 
 
 ---
 
-
+© 2025 **TeamTalk** — Todos os direitos reservados.
