@@ -1,3 +1,3 @@
 <x-app-layout>
-    @livewire('chat-messages')
+    @livewire('chat')
 </x-app-layout>

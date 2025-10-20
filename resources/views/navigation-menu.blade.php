@@ -13,9 +13,20 @@
                 <!-- Navigation Links -->
                 @auth
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
+                        <x-nav-link href="{{ route('chat.dashboard') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Chat') }}
                         </x-nav-link>
+                        <x-nav-link href="{{ route('chat.rooms') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Salas') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('chat.contacts') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Contatos') }}
+                        </x-nav-link>
+                        @can('admin')
+                            <x-nav-link href="{{ route('chat.admin') }}" :active="request()->routeIs('chat.admin')">
+                                {{ __('Administração') }}
+                            </x-nav-link>
+                        @endcan
                     </div>
                 @endauth
             </div>
@@ -158,9 +169,20 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @auth
-                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
+                <x-responsive-nav-link href="{{ route('chat.dashboard') }}" :active="request()->routeIs('chat.dashboard')">
+                    {{ __('Chat') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('chat.rooms') }}" :active="request()->routeIs('chat.rooms')">
+                    {{ __('Salas') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('chat.contacts') }}" :active="request()->routeIs('chat.contacts')">
+                    {{ __('Contatos') }}
+                </x-responsive-nav-link>
+                @can('admin')
+                    <x-responsive-nav-link href="{{ route('chat.admin') }}" :active="request()->routeIs('chat.admin')">
+                        {{ __('Administração') }}
+                    </x-responsive-nav-link>
+                @endcan
             @endauth
             @guest
                 <x-responsive-nav-link href="{{ route('faq') }}" :active="request()->routeIs('faq')">

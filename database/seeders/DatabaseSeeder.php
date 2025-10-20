@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->count(3)->create([
             'role' => 'admin'
         ])->each(function ($user) {
+            /*
             $rooms = Room::factory(rand(1, 3))->create(['created_by' => $user->id]);
 
             foreach ($rooms as $room) {
@@ -25,12 +26,14 @@ class DatabaseSeeder extends Seeder
                     'sender_id' => $user->id,
                 ]);
             }
+                */
         });
 
         
         User::factory()->count(7)->create([
             'role' => 'user'
         ])->each(function ($user) {
+        /*
             $rooms = Room::inRandomOrder()->take(rand(1, 2))->get();
 
             foreach ($rooms as $room) {
@@ -41,6 +44,7 @@ class DatabaseSeeder extends Seeder
                     'sender_id' => $user->id,
                 ]);
             }
+                */
         });
     }
 }

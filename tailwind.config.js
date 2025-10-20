@@ -17,10 +17,16 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                'teamtalk-blue': '#134c96',
-                'teamtalk-blue-claro': '#249fda',
-                'teamtalk-green': '#3e802f',
-                'teamtalk-green-claro': '#559e35',
+                'teamtalk-blue': {
+                    DEFAULT: '#134c96',
+                    claro: '#249fda',
+                },
+                'teamtalk-green': {
+                    DEFAULT: '#3e802f',
+                    claro: '#559e35',
+                },
+                'teamtalk-orange': '#ee7019',
+                'teamtalk-gray': '#3f3f50',
             },
         },
     },

@@ -82,13 +82,6 @@
             @endif
         </div>
 
-        <!-- Avatar -->
-        <div class="col-span-6 sm:col-span-4">
-            <x-label for="avatar" value="{{ __('Avatar URL') }}" />
-            <x-input id="avatar" type="text" class="mt-1 block w-full" wire:model="state.avatar" autocomplete="avatar" />
-            <x-input-error for="avatar" class="mt-2" />
-        </div>
-
         <!-- Bio -->
         <div class="col-span-6 sm:col-span-4">
             <x-label for="bio" value="{{ __('Bio') }}" />
@@ -122,7 +115,7 @@
             {{ __('Salvo.') }}
         </x-action-message>
 
-        <x-button wire:loading.attr="disabled" wire:target="photo">
+        <x-button type="submit" wire:loading.attr="disabled" wire:target="photo">
             {{ __('Salvar') }}
         </x-button>
     </x-slot>

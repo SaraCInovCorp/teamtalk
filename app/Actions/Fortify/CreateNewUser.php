@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Http\UploadedFile;
+use App\Models\Contact;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -40,17 +41,23 @@ class CreateNewUser implements CreatesNewUsers
             'is_active' => true,
         ]);
 
-        if (isset($input['avatar']) && $input['avatar'] instanceof UploadedFile) {
-            $avatarPath = $input['avatar']->store('avatars', 'public');
-            $user->avatar = $avatarPath;
-        }
-
         if (isset($input['profile_photo']) && $input['profile_photo'] instanceof UploadedFile) {
             $profilePhotoPath = $input['profile_photo']->store('profile-photos', 'public');
             $user->profile_photo_path = $profilePhotoPath;
         }
 
         $user->save();
+
+        if (!empty($input['invite_token'])) {
+            $contact = Contact::where('token', $input['invite_token'])->first();
+            if ($contact && $contact->contact_id === null) {
+                $contact->update([
+                    'contact_id' => $user->id,
+                    'status' => 'accepted',
+                    'token' => null,  
+                ]);
+            }
+        }
 
         return $user;
 

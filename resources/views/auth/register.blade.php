@@ -9,6 +9,8 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
+            <input type="hidden" name="invite_token" value="{{ request('invite_token') }}">
+
             <!-- Name -->
             <div>
                 <x-label for="name" value="{{ __('Name') }}" />
@@ -37,12 +39,6 @@
             <div class="mt-4">
                 <x-label for="profile_photo" value="Foto de perfil" />
                 <x-input id="profile_photo" type="file" name="profile_photo" accept="image/png,image/jpeg,image/jpg" />
-            </div>
-            
-            <!-- Avatar -->
-            <div class="mt-4">
-                <x-label for="avatar" value="Avatar" />
-                <x-input id="avatar" type="file" name="avatar" accept="image/*" />
             </div>
 
             <!-- Bio -->
@@ -79,7 +75,7 @@
                     {{ __('Already registered?') }}
                 </a>
 
-                <x-button class="ms-4">
+                <x-button type="submit" class="ms-4">
                     {{ __('Register') }}
                 </x-button>
             </div>

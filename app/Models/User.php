@@ -71,4 +71,29 @@ class User extends Authenticatable
     {
         return $this->role === 'user';
     }
+
+    public function isInRoom($roomId)
+    {
+        return $this->rooms()->where('room_id', $roomId)->exists();
+    }
+
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class, 'user_id');
+    }
+
+    public function acceptedContacts()
+    {
+        return Contact::where(function($query) {
+            $query->where('user_id', $this->id)
+                ->orWhere('contact_id', $this->id);
+        })->where('status', 'accepted');
+    }
+
+    public function incomingContacts()
+    {
+        return $this->hasMany(Contact::class, 'contact_id');
+    }
+
+
 }

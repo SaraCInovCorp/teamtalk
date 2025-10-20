@@ -1,23 +1,26 @@
 @component('mail::message')
-{{ __('You have been invited to join the :team team!', ['team' => $invitation->team->name]) }}
+{{ __('Você foi convidado para entrar no TeamTalk.') }}
 
 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
-{{ __('If you do not have an account, you may create one by clicking the button below. After creating an account, you may click the invitation acceptance button in this email to accept the team invitation:') }}
+{{ __('Se ainda não possui uma conta, você pode criar uma clicando no botão abaixo. Após criar a conta, use o botão para aceitar o convite:') }}
 
-@component('mail::button', ['url' => route('register')])
-{{ __('Create Account') }}
+@component('mail::button', ['url' => route('register', ['invite_token' => $token])])
+{{ __('Criar Conta') }}
 @endcomponent
 
-{{ __('If you already have an account, you may accept this invitation by clicking the button below:') }}
+{{ __('Se você já tem uma conta, pode aceitar o convite clicando no botão abaixo:') }}
 
 @else
-{{ __('You may accept this invitation by clicking the button below:') }}
+{{ __('Você pode aceitar o convite clicando no botão abaixo:') }}
 @endif
 
+@php
+    $acceptUrl = url('/invite/accept/'.$token); // ou outra rota que implemente aceitação
+@endphp
 
 @component('mail::button', ['url' => $acceptUrl])
-{{ __('Accept Invitation') }}
+{{ __('Aceitar Convite') }}
 @endcomponent
 
-{{ __('If you did not expect to receive an invitation to this team, you may discard this email.') }}
+{{ __('Se você não esperava receber este convite, pode ignorar este email.') }}
 @endcomponent

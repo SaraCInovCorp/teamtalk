@@ -31,16 +31,16 @@
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
-                    <button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
+                    <x-button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
                                     x-show="! recovery"
                                     x-on:click="
                                         recovery = true;
                                         $nextTick(() => { $refs.recovery_code.focus() })
                                     ">
                         {{ __('Use um código de recuperação') }}
-                    </button>
+                    </x-button>
 
-                    <button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
+                    <x-button type="button" class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
                                     x-cloak
                                     x-show="recovery"
                                     x-on:click="
@@ -48,9 +48,9 @@
                                         $nextTick(() => { $refs.code.focus() })
                                     ">
                         {{ __('Use um código de autenticação') }}
-                    </button>
+                    </x-button>
 
-                    <x-button class="ms-4">
+                    <x-button type="submit" class="ms-4">
                         {{ __('Log in') }}
                     </x-button>
                 </div>

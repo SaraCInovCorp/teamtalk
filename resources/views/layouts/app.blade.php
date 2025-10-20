@@ -7,6 +7,9 @@
     <title>{{ config('app.name', 'TeamTalk') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    @livewireStyles
+    <script defer src="//unpkg.com/alpinejs" ></script>
+    @livewireScripts
 </head>
 <body class="font-sans antialiased">
     <x-banner />
@@ -29,5 +32,20 @@
 
     @stack('modals')
     @livewireScripts
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('start-private-chat', (data) => {
+                console.log('Evento start-private-chat recebido com ID:', data.contactId);
+            });
+
+            Livewire.on('open-invite-contact-modal', () => {
+                console.log('Evento open-invite-contact-modal recebido');
+            });
+        });
+    </script>
+
+
+
 </body>
 </html>

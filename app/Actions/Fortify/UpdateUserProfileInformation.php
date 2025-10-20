@@ -21,7 +21,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
-            'avatar' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
             'is_active' => ['boolean'],
             'bio' => ['nullable', 'string'],
             'status_message' => ['nullable', 'string', 'max:255'],
@@ -29,11 +28,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);
-        }
-
-        if (isset($input['avatar'])) {
-            $path = $input['avatar']->store('avatars', 'public');
-            $user->avatar = $path;
         }
 
         $user->name = $input['name'];
