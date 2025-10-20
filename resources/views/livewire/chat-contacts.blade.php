@@ -39,7 +39,7 @@
                 @foreach(range('A', 'Z') as $l)
                     <x-button 
                         wire:click="$set('letter', '{{ $l }}')" 
-                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-white text-teamtalk-gray hover:text-white' }}">
+                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-white text-black hover:text-white' }}">
                         {{ $l }}
                     </x-button>
                 @endforeach
@@ -117,14 +117,22 @@
                     @forelse ($pendingContacts as $contact)
                         @php
                             $name = $contact->contactUser->name ?? $contact->email;
+                            $isDeclined = $contact->status === 'declined';
                         @endphp
                         <li class="flex justify-between items-center py-2">
                             <span>{{ $name }}</span>
                             <div class="flex gap-2 items-center">
-                                <span class="text-gray-400 text-sm">Aguardando resposta</span>
-                                <x-secondary-button wire:click="cancelInvite({{ $contact->id }})" class="hover:bg-red-600 hover:text-white">
-                                    Cancelar
-                                </x-secondary-button>
+                                @if ($isDeclined)
+                                    <span class="text-teamtalk-orange text-sm">Recusado</span>
+                                    <x-secondary-button wire:click="deleteInvite({{ $contact->id }})" class="hover:bg-teamtalk-orange hover:text-white">
+                                        Excluir
+                                    </x-secondary-button>
+                                @else
+                                    <span class="text-teamtalk-gray text-sm">Aguardando resposta</span>
+                                    <x-secondary-button wire:click="cancelInvite({{ $contact->id }})" class="hover:bg-teamtalk-orange hover:text-white">
+                                        Cancelar
+                                    </x-secondary-button>
+                                @endif
                             </div>
                         </li>
                     @empty

@@ -6,10 +6,13 @@
     </x-slot>
     <x-authentication-card>
         <x-validation-errors class="mb-4" />
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
             @csrf
 
             <input type="hidden" name="invite_token" value="{{ request('invite_token') }}">
+            @if (request('invite_token'))
+                <p class="text-green-600 text-sm mt-2">Token detectado: {{ request('invite_token') }}</p>
+            @endif
 
             <!-- Name -->
             <div>

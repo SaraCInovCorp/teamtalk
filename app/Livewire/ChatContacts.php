@@ -80,13 +80,6 @@ class ChatContacts extends Component
         $this->resetPage();
     }
 
-    public function declineInvite($inviteId)
-    {
-        $invite = Contact::findOrFail($inviteId);
-        $invite->delete();
-        session()->flash('message', 'Convite recusado.');
-    }
-
     public function cancelInvite($contactId)
     {
         $contact = Contact::find($contactId);
@@ -104,127 +97,145 @@ class ChatContacts extends Component
         $this->resetPage(); 
     }
 
+    public function declineInvite($inviteId)
+    {
+        $invite = Contact::findOrFail($inviteId);
+        $invite->update(['status' => 'declined']);
+        session()->flash('message', 'Convite recusado.');
+    }
+
+
+    public function deleteInvite($contactId)
+    {
+        $contact = Contact::findOrFail($contactId);
+        if ($contact->user_id === auth()->id() && $contact->status === 'declined') {
+            $contact->delete();
+            session()->flash('message', 'Convite excluído.');
+            $this->resetPage();
+            return redirect()->route('chat.contacts');
+        }
+    }
 
     public function render()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Contatos aceitos (amizades aprovadas)
-    $acceptedContactsQuery = Contact::where('status', 'accepted')
-        ->where(function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-              ->orWhere('contact_id', $user->id);
-        })->with(['user', 'contactUser']);
+        // Contatos aceitos (amizades aprovadas)
+        $acceptedContactsQuery = Contact::where('status', 'accepted')
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                ->orWhere('contact_id', $user->id);
+            })->with(['user', 'contactUser']);
 
-    // Convites recebidos
-    $incomingInvitesQuery = Contact::where('contact_id', $user->id)
-        ->where('status', 'pending')
-        ->with('user');
+        // Convites recebidos
+        $incomingInvitesQuery = Contact::where('contact_id', $user->id)
+            ->where('status', 'pending')
+            ->with('user');
 
-    // Convites pendentes
-    $pendingContactsQuery = Contact::where('user_id', $user->id)
-        ->where('status', 'pending')
-        ->with('contactUser');
+        // Convites pendentes
+        $pendingContactsQuery = Contact::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'declined'])
+            ->with('contactUser');
 
-    // Prioriza busca por texto
-    if (!empty($this->search)) {
-        $term = $this->search;
+        // Prioriza busca por texto
+        if (!empty($this->search)) {
+            $term = $this->search;
 
-        $acceptedContactsQuery->where(function ($query) use ($user, $term) {
-            $query
-                // Nome do contactUser para contatos que criei
-                ->where(function($sub) use($user, $term){
-                    $sub->where('user_id', $user->id)
-                        ->whereHas('contactUser', fn($q) =>
-                            $q->where('name', 'like', '%' . $term . '%')
-                        );
-                })
-                // Nome do user para contatos que recebi
-                ->orWhere(function($sub) use($user, $term){
-                    $sub->where('contact_id', $user->id)
-                        ->whereHas('user', fn($q) =>
-                            $q->where('name', 'like', '%' . $term . '%')
-                        );
-                })
-                // Por email se contato não tem usuário vinculado
-                ->orWhere(function($sub) use($user, $term){
-                    $sub->where('user_id', $user->id)
-                        ->whereNull('contact_id')
-                        ->where('email', 'like', '%' . $term . '%');
-                });
-        });
+            $acceptedContactsQuery->where(function ($query) use ($user, $term) {
+                $query
+                    // Nome do contactUser para contatos que criei
+                    ->where(function($sub) use($user, $term){
+                        $sub->where('user_id', $user->id)
+                            ->whereHas('contactUser', fn($q) =>
+                                $q->where('name', 'like', '%' . $term . '%')
+                            );
+                    })
+                    // Nome do user para contatos que recebi
+                    ->orWhere(function($sub) use($user, $term){
+                        $sub->where('contact_id', $user->id)
+                            ->whereHas('user', fn($q) =>
+                                $q->where('name', 'like', '%' . $term . '%')
+                            );
+                    })
+                    // Por email se contato não tem usuário vinculado
+                    ->orWhere(function($sub) use($user, $term){
+                        $sub->where('user_id', $user->id)
+                            ->whereNull('contact_id')
+                            ->where('email', 'like', '%' . $term . '%');
+                    });
+            });
 
-        $incomingInvitesQuery->where(function ($query) use ($term) {
-            $query
-                ->whereHas('user', fn($q) =>
-                    $q->where('name', 'like', '%' . $term . '%')
-                )
-                ->orWhere('email', 'like', '%' . $term . '%');
-        });
+            $incomingInvitesQuery->where(function ($query) use ($term) {
+                $query
+                    ->whereHas('user', fn($q) =>
+                        $q->where('name', 'like', '%' . $term . '%')
+                    )
+                    ->orWhere('email', 'like', '%' . $term . '%');
+            });
 
-        $pendingContactsQuery->where(function ($query) use ($term) {
-            $query
-                ->whereHas('contactUser', fn($q) =>
-                    $q->where('name', 'like', '%' . $term . '%')
-                )
-                ->orWhere('email', 'like', '%' . $term . '%');
-        });
+            $pendingContactsQuery->where(function ($query) use ($term) {
+                $query
+                    ->whereHas('contactUser', fn($q) =>
+                        $q->where('name', 'like', '%' . $term . '%')
+                    )
+                    ->orWhere('email', 'like', '%' . $term . '%');
+            });
+        }
+        // Se não há busca, usa filtro de letra
+        elseif (!empty($this->letter)) {
+            $l = $this->letter;
+
+            $acceptedContactsQuery->where(function ($query) use ($user, $l) {
+                $query
+                    // Nome do contactUser para contatos que criei
+                    ->where(function($sub) use($user, $l){
+                        $sub->where('user_id', $user->id)
+                            ->whereHas('contactUser', fn($q) =>
+                                $q->where('name', 'like', $l . '%')
+                            );
+                    })
+                    // Nome do user para contatos que recebi
+                    ->orWhere(function($sub) use($user, $l){
+                        $sub->where('contact_id', $user->id)
+                            ->whereHas('user', fn($q) =>
+                                $q->where('name', 'like', $l . '%')
+                            );
+                    })
+                    // Por email se contato não tem usuário vinculado
+                    ->orWhere(function($sub) use($user, $l){
+                        $sub->where('user_id', $user->id)
+                            ->whereNull('contact_id')
+                            ->where('email', 'like', $l . '%');
+                    });
+            });
+
+            $incomingInvitesQuery->where(function ($query) use ($l) {
+                $query
+                    ->whereHas('user', fn($q) =>
+                        $q->where('name', 'like', $l . '%')
+                    )
+                    ->orWhere('email', 'like', $l . '%');
+            });
+
+            $pendingContactsQuery->where(function ($query) use ($l) {
+                $query
+                    ->whereHas('contactUser', fn($q) =>
+                        $q->where('name', 'like', $l . '%')
+                    )
+                    ->orWhere('email', 'like', $l . '%');
+            });
+        }
+
+        $acceptedContacts = $acceptedContactsQuery->get();
+        $incomingInvites = $incomingInvitesQuery->get();
+        $pendingContacts = $pendingContactsQuery->paginate(10);
+
+        return view('livewire.chat-contacts', compact(
+            'acceptedContacts',
+            'pendingContacts',
+            'incomingInvites'
+        ));
     }
-    // Se não há busca, usa filtro de letra
-    elseif (!empty($this->letter)) {
-        $l = $this->letter;
-
-        $acceptedContactsQuery->where(function ($query) use ($user, $l) {
-            $query
-                // Nome do contactUser para contatos que criei
-                ->where(function($sub) use($user, $l){
-                    $sub->where('user_id', $user->id)
-                        ->whereHas('contactUser', fn($q) =>
-                            $q->where('name', 'like', $l . '%')
-                        );
-                })
-                // Nome do user para contatos que recebi
-                ->orWhere(function($sub) use($user, $l){
-                    $sub->where('contact_id', $user->id)
-                        ->whereHas('user', fn($q) =>
-                            $q->where('name', 'like', $l . '%')
-                        );
-                })
-                // Por email se contato não tem usuário vinculado
-                ->orWhere(function($sub) use($user, $l){
-                    $sub->where('user_id', $user->id)
-                        ->whereNull('contact_id')
-                        ->where('email', 'like', $l . '%');
-                });
-        });
-
-        $incomingInvitesQuery->where(function ($query) use ($l) {
-            $query
-                ->whereHas('user', fn($q) =>
-                    $q->where('name', 'like', $l . '%')
-                )
-                ->orWhere('email', 'like', $l . '%');
-        });
-
-        $pendingContactsQuery->where(function ($query) use ($l) {
-            $query
-                ->whereHas('contactUser', fn($q) =>
-                    $q->where('name', 'like', $l . '%')
-                )
-                ->orWhere('email', 'like', $l . '%');
-        });
-    }
-
-    $acceptedContacts = $acceptedContactsQuery->get();
-    $incomingInvites = $incomingInvitesQuery->get();
-    $pendingContacts = $pendingContactsQuery->paginate(10);
-
-    return view('livewire.chat-contacts', compact(
-        'acceptedContacts',
-        'pendingContacts',
-        'incomingInvites'
-    ));
-}
 
 
 

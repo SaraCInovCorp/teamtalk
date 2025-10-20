@@ -20,6 +20,27 @@ Sistema de chat e colaboração em tempo real construído com **Laravel 12**, of
 
 ---
 
+## Sistema de Contatos, Convites e Filtros
+
+O TeamTalk possui um sistema avançado de contatos e convites, com os seguintes destaques:
+
+- Convites para contato via e-mail, funcionando tanto para usuários já cadastrados quanto para novos e-mails externos.
+- Quando um novo usuário se registra:
+  - Todos os convites pendentes enviados para o e-mail dele são automaticamente associados à nova conta.
+  - Convites aparecem na lista de "Convites Recebidos" após login, permitindo aceitar ou recusar.
+  - O fluxo funciona tanto via link de convite (`invite_token`) quanto por registro normal.
+- Agrupamento dinâmico dos contatos em:
+  - **Contatos Aceitos** (amizades confirmadas recíprocas)
+  - **Convites Recebidos** (aguardam ação do usuário)
+  - **Convites Pendentes** (enviados e não respondidos)
+- Aceitar, recusar e cancelar convites diretamente da interface, com atualização em tempo real das listas e feedback visual imediato.
+- Filtro alfabético: índice de letras que filtra apenas nomes/e-mails que começam com a letra escolhida.
+- Pesquisa por texto abrangente (nome ou e-mail), ativada por botão, sem conflito com filtro de letra.
+- Sempre exibe a "outra pessoa" no relacionamento, nunca o próprio usuário.
+- Mensagem informativa para todas as ações no painel de contatos.
+
+---
+
 ## Estrutura do Banco de Dados
 
 ### Tabelas principais
@@ -36,13 +57,15 @@ Sistema de chat e colaboração em tempo real construído com **Laravel 12**, of
 - **rooms:** salas de chat criadas, com avatar, nome e criador.
 - **room_user:** tabela pivô relacionando usuários às salas, com o papel respectivo (membro ou admin).
 - **messages:** registro de mensagens, podendo referenciar uma sala (mensagens públicas) ou destinatário (mensagens privadas).
+- **contacts:** relacionamentos de convites, aceitos e pendentes entre usuários e convites por e-mail.
 
 ### Relações importantes e fluxo
 
-- Usuários têm papéis definidos diretamente na tabela `users` via campo `role`.
-- Cada usuário pode participar de múltiplas salas via tabela intermediária `room_user`.
-- Mensagens privadas e de grupo coexistem na tabela `messages`.
-- Logs de atividades (implementados via **Spatie Activity Log**) registram eventos importantes como logins e envio de mensagens.
+- Usuários têm papéis definidos no campo `role`.
+- Cada usuário pode participar de múltiplas salas.
+- Mensagens privadas e de grupo coexistem.
+- Logs de atividades via **Spatie Activity Log** registram eventos importantes.
+- Sistema de contatos gerenciado por Livewire, com separação entre convites recebidos, aceitos e pendentes.
 
 ---
 
@@ -94,16 +117,14 @@ php artisan migrate
 
 ## Autenticação e Registro
 
-O sistema usa **Laravel Jetstream com Livewire**, permitindo:
-- Registro e login completo.
-- Upload de **foto de perfil** (`profile_photo`) e **avatar** durante o cadastro.
-- Campos customizados: *bio*, *status_message* e flag `is_active`.
-
-As imagens são armazenadas em:
-- `storage/app/public/avatars`
-- `storage/app/public/profile-photos`
-
-Para torná-las acessíveis publicamente:
+- Laravel Jetstream com Livewire.
+- Upload de foto de perfil (profile_photo).
+- Campos customizados: bio e status_message.
+- Convites via e-mail:
+  - Registro com link de convite (/invite/accept/{token}) associa o token automaticamente.
+  - Convites pendentes para o e-mail são vinculados ao usuário após registro.
+- Imagens de perfil armazenadas em storage/app/public/profile-photos.
+- Tornar acessíveis publicamente:
 
 ```
 php artisan storage:link
@@ -176,16 +197,9 @@ php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProv
 ## Frontend e UI
 
 - TailwindCSS e DaisyUI prontos.
-- Em `tailwind.config.js`:  
-  Adicione o DaisyUI ao array de plugins.
-
-```
-plugins: [forms, typography, require('daisyui')],
-```
-
-Inclui também:
-- **Componentes Blade personalizados** para botões, inputs, labels flutuantes e checkboxes.
-- **Design responsivo** utilizando padrões utilitários do Tailwind.
+- Adicione DaisyUI ao array de plugins no tailwind.config.js.
+- Inclui componentes Blade personalizados para botões, inputs, labels e checkboxes.
+- Design responsivo com utilitários do Tailwind.
 
 ---
 
@@ -243,7 +257,8 @@ npm run dev # Compilar assets
   - `main` para produção.
   - `dev` para testes internos.
 - Mantenha o layout base com Livewire e scripts de broadcasting ativos.
-- Utilize componentes Blade reutilizáveis (btn, input, checkbox, label) para consistência visual e produtividade. 
+- Utilize componentes Blade reutilizáveis para consistência visual e produtividade.
+- Explore a documentação do componente de contatos para avançar filtros, botões e abordagem de UX atualizada.
 
 ---
 

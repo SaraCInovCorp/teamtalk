@@ -9,6 +9,7 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Http\UploadedFile;
 use App\Models\Contact;
+use Illuminate\Support\Facades\Request;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -28,10 +29,10 @@ class CreateNewUser implements CreatesNewUsers
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
             'bio' => ['nullable', 'string', 'max:1000'],
             'status_message' => ['nullable', 'string', 'max:255'],
-            'avatar' => ['nullable', 'image', 'max:1024'],
             'profile_photo' => ['nullable', 'image', 'max:1024'],
         ])->validate();
 
+        // Criação do usuário
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
@@ -41,25 +42,37 @@ class CreateNewUser implements CreatesNewUsers
             'is_active' => true,
         ]);
 
+        // Upload da foto de perfil (se existir)
         if (isset($input['profile_photo']) && $input['profile_photo'] instanceof UploadedFile) {
             $profilePhotoPath = $input['profile_photo']->store('profile-photos', 'public');
             $user->profile_photo_path = $profilePhotoPath;
+            $user->save();
         }
 
-        $user->save();
+        // Atualiza convites existentes para este email
+        $pendingInvites = Contact::where('email', $user->email)
+            ->whereNull('contact_id')
+            ->get();
 
-        if (!empty($input['invite_token'])) {
-            $contact = Contact::where('token', $input['invite_token'])->first();
-            if ($contact && $contact->contact_id === null) {
-                $contact->update([
+        foreach ($pendingInvites as $invite) {
+            $invite->update([
+                'contact_id' => $user->id,
+                'status' => 'pending', // mantém pendente até o usuário aceitar no chat
+            ]);
+        }
+
+        // Se veio token direto no registro (link específico)
+        $inviteToken = $input['invite_token'] ?? Request::get('invite_token');
+        if (!empty($inviteToken)) {
+            $invite = Contact::where('token', $inviteToken)->first();
+            if ($invite && $invite->contact_id === null) {
+                $invite->update([
                     'contact_id' => $user->id,
-                    'status' => 'accepted',
-                    'token' => null,  
+                    'status' => 'pending',
                 ]);
             }
         }
 
         return $user;
-
     }
 }
