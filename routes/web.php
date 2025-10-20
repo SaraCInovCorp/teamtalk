@@ -17,9 +17,16 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified', ]
     Route::get('chat', fn() => view('chat.chat'))->name('chat');
     Route::get('chat/dashboard', fn() => view('chat.chat-dashboard'))->name('chat.dashboard');
     Route::get('chat/salas', fn() => view('chat.chat-rooms'))->name('chat.rooms');
+    Route::get('chat/salas/criar', fn() => view('chat.room-create'))->name('chat.room.create');
     Route::get('chat/salas/{room}/config', function ($room) {
         return view('chat.room-settings', ['roomId' => $room]);
     })->name('chat.room.settings');
+    Route::get('chat/salas/{room?}', function ($room = null) {
+        return view('chat.chat-messages', [
+            'roomId' => $room,
+            'recipientId' => null,
+        ]);
+    })->name('chat.room');
     Route::get('chat/contatos', fn() => view('chat.chat-contacts'))->name('chat.contacts');
     Route::get('chat/contatos/convidar', fn() => view('chat.invite-contact'))->name('chat.invite');
     Route::get('chat/admin', fn() => view('chat.admin-panel'))->middleware('can:admin')->name('chat.admin');

@@ -12,7 +12,7 @@ class ChatRooms extends Component
     public function selectRoom($id)
     {
         $this->roomId = $id;
-        $this->emit('roomSelected', $id);
+       
     }
 
     public function render()

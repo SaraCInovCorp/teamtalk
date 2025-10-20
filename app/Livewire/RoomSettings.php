@@ -11,14 +11,21 @@ class RoomSettings extends Component
 
     protected $rules = [
         'room.name' => 'required|string|max:255',
-        // outras validações
+        // outras regras para campos da sala
     ];
+
+    public function mount($roomId)
+    {
+        $this->room = Room::with('users')->findOrFail($roomId);
+    }
+
 
     public function save()
     {
         $this->validate();
         $this->room->save();
-        session()->flash('message', 'Configurações salvas.');
+
+        session()->flash('message', 'Configurações salvas com sucesso!');
     }
 
     public function render()
@@ -26,3 +33,4 @@ class RoomSettings extends Component
         return view('livewire.room-settings');
     }
 }
+

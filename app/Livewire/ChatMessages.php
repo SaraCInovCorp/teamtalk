@@ -36,12 +36,12 @@ class ChatMessages extends Component
 
         broadcast(new MessageSent($message))->toOthers();
 
-        $this->messageText = '';  // Limpa o campo de input após enviar
+        $this->messageText = '';  
     }
 
     public function handleNewMessage($payload)
     {
-        $this->emit('refreshMessages');
+        //$this->emit('refreshMessages');
     }
 
     public function getMessagesProperty()
@@ -55,6 +55,19 @@ class ChatMessages extends Component
             ->get()
             ->reverse(); 
     }
+
+    public function mount($roomId = null, $recipientId = null)
+    {
+        $this->roomId = $roomId;
+        $this->recipientId = $recipientId;
+
+        // Se nenhum room nem recipient, pode carregar última conversa
+        if (!$this->roomId && !$this->recipientId) {
+            $lastRoom = Auth::user()->rooms()->latest()->first();
+            $this->roomId = $lastRoom?->id;
+        }
+    }
+
 
     public function render()
     {

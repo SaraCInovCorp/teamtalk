@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Message;
 
 class Room extends Model
 {
@@ -11,12 +13,22 @@ class Room extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'avatar', 'is_private', 'created_by',
+        'name', 
+        'avatar', 
+        'is_private', 
+        'created_by',
+        'description',
+        'allow_attachment',
+        'allow_edit_description',
+        'allow_send_messages',
+        'message_delete_days',
     ];
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('role_in_room', 'joined_at')->withTimestamps();
+        return $this->belongsToMany(User::class)
+                    ->withPivot('role_in_room', 'joined_at')
+                    ->withTimestamps();
     }
 
     public function messages()
@@ -28,4 +40,20 @@ class Room extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function allowsAttachments(): bool
+    {
+        return $this->allow_attachment;
+    }
+
+    public function canEditDescription(): bool
+    {
+        return $this->allow_edit_description;
+    }
+
+    public function canSendMessages(): bool
+    {
+        return $this->allow_send_messages;
+    }
+    
 }

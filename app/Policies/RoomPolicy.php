@@ -68,4 +68,31 @@ class RoomPolicy
     {
         return $user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists();
     }
+
+    public function editDescription(User $user, Room $room): bool
+    {
+        if (!($user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists())) {
+            return false;
+        }
+
+        return $room->allow_edit_description;
+    }
+
+    public function attachFiles(User $user, Room $room): bool
+    {
+        if (!($user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists())) {
+            return false;
+        }
+
+        return $room->allow_attachment;
+    }
+
+    public function sendMessages(User $user, Room $room): bool
+    {
+        if (!($user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists())) {
+            return false;
+        }
+
+        return $room->allow_send_messages;
+    }
 }

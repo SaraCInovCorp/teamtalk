@@ -1,3 +1,3 @@
 <x-chat-layout>
-    @livewire('chat-rooms')
+    @livewire('room-create')
 </x-chat-layout>

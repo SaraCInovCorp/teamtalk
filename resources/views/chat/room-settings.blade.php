@@ -1,3 +1,3 @@
-<x-app-layout>
+<x-chat-layout>
     @livewire('room-settings', ['roomId' => $roomId])
-</x-app-layout>
+</x-chat-layout>
