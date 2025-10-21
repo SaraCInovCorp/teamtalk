@@ -3,9 +3,9 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Room;
-use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Room;
 
 class RoomCreate extends Component
 {
@@ -22,7 +22,7 @@ class RoomCreate extends Component
 
     protected $rules = [
         'name' => 'required|string|max:255',
-        'avatar' => 'nullable|image|max:1024', // 1MB máximo
+        'avatar' => 'nullable|image|max:1024',
         'description' => 'nullable|string',
         'is_private' => 'boolean',
         'allow_attachment' => 'boolean',
@@ -35,10 +35,7 @@ class RoomCreate extends Component
     {
         $this->validate();
 
-        $avatarPath = null;
-        if ($this->avatar) {
-            $avatarPath = $this->avatar->store('avatars', 'public');
-        }
+        $avatarPath = $this->avatar ? $this->avatar->store('avatars', 'public') : null;
 
         $room = Room::create([
             'name' => $this->name,
@@ -49,16 +46,23 @@ class RoomCreate extends Component
             'allow_attachment' => $this->allow_attachment,
             'allow_edit_description' => $this->allow_edit_description,
             'allow_send_messages' => $this->allow_send_messages,
-            'message_delete_days' => $this->message_delete_days,
+            'message_delete_days' => $this->message_delete_days ?? 0,
+        ]);
+
+        $room->users()->attach(Auth::id(), [
+            'joined_at' => now(),
+            'role_in_room' => 'admin', 
+            'blocked' => false, 
         ]);
 
         session()->flash('message', 'Sala criada com sucesso!');
 
-        return redirect()->route('chat.room.settings', $room->id);
+        return redirect()->route('chat.room', $room->id);
     }
 
     public function render()
     {
-        return view('livewire.room-create');
+        return view('livewire.room-create')
+            ->layout('layouts.chat-layout'); 
     }
 }

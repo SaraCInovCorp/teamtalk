@@ -1,0 +1,27 @@
+/* stylelint-disable empty-rules */
+
+/* =========================================================
+   TeamTalk — Tailwind Safelist
+   ---------------------------------------------------------
+   Este arquivo existe apenas para garantir que as classes
+   dinâmicas usadas em templates Blade não sejam removidas
+   pelo purge do Tailwind.
+   ========================================================= */
+
+@layer utilities {
+  .bg-teamtalk-blue-claro { /* keep */ }
+  .bg-teamtalk-green-claro { /* keep */ }
+  .bg-teamtalk-orange { /* keep */ }
+  .text-teamtalk-orange { /* keep */ }
+  .text-teamtalk-gray { /* keep */ }
+
+  .hover\:bg-teamtalk-green-claro:hover { /* keep */ }
+  .hover\:bg-teamtalk-orange:hover { /* keep */ }
+  .hover\:text-white:hover { /* keep */ }
+
+  .bg-white { /* keep */ }
+  .text-white { /* keep */ }
+  .text-black { /* keep */ }
+}
+
+/* stylelint-enable empty-rules */

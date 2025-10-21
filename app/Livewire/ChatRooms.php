@@ -15,10 +15,12 @@ class ChatRooms extends Component
        
     }
 
+    
+
     public function render()
     {
         return view('livewire.chat-rooms', [
             'rooms' => Auth::user()->rooms()->with('users')->get(),
-        ]);
+        ])->layout('layouts.chat-layout');
     }
 }

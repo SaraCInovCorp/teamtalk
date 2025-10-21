@@ -13,7 +13,18 @@
             </div>
         @endif
 
-        <form wire:submit.prevent="save" class="space-y-4">
+        @if ($errors->any())
+            <div class="bg-red-100 text-red-800 p-2 mb-4 rounded">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form wire:submit.prevent="save" enctype="multipart/form-data" class="space-y-4">
+
             <div>
                 <x-label for="name" value="{{ __('Nome da Sala') }}" />
                 <x-input type="text" wire:model.defer="name" id="name" />
@@ -31,31 +42,18 @@
 
             <div>
                 <x-label for="description" value="{{ __('Descrição') }}" />
-                <x-text-area id="description" rows="4" wire:model.defer="description">
-                    {{ $description }}
-                </x-text-area>
+                <x-text-area id="description" rows="4" wire:model.defer="description"></x-text-area>
                 <x-input-error for="description" class="text-red-600 mt-1" />
-
             </div>
 
             <div class="flex items-center space-x-4">
-                <x-checkbox wire:model.defer="is_private" id="is_private" >
-                    Sala Privada
-                </x-checkbox>
-
-                <x-checkbox wire:model.defer="allow_attachment" id="allow_attachment" >
-                    Permitir anexos
-                </x-checkbox>
-
+                <x-checkbox wire:model.defer="is_private" id="is_private">Sala Privada</x-checkbox>
+                <x-checkbox wire:model.defer="allow_attachment" id="allow_attachment">Permitir anexos</x-checkbox>
             </div>
 
             <div class="flex items-center space-x-4">
-                <x-checkbox wire:model.defer="allow_edit_description" id="allow_edit_description">
-                    Permitir editar descrição
-                </x-checkbox>
-                <x-checkbox wire:model.defer="allow_send_messages" id="allow_send_messages" >
-                    Permitir enviar mensagens
-                </x-checkbox>
+                <x-checkbox wire:model.defer="allow_edit_description" id="allow_edit_description">Permitir editar descrição</x-checkbox>
+                <x-checkbox wire:model.defer="allow_send_messages" id="allow_send_messages">Permitir enviar mensagens</x-checkbox>
             </div>
 
             <div>

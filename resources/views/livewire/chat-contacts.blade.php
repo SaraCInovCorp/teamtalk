@@ -39,7 +39,7 @@
                 @foreach(range('A', 'Z') as $l)
                     <x-button 
                         wire:click="$set('letter', '{{ $l }}')" 
-                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-white text-black hover:text-white' }}">
+                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-white text-teamtalk-gray hover:text-white' }}">
                         {{ $l }}
                     </x-button>
                 @endforeach

@@ -11,6 +11,18 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
+    safelist: [
+        'bg-teamtalk-blue-claro',
+        'text-white',
+        'bg-white',
+        'text-black',
+        'hover:text-white',
+        'hover:bg-teamtalk-orange',
+        'hover:bg-teamtalk-green-claro',
+        'text-teamtalk-orange',
+        'text-teamtalk-gray',
+    ],
+
     theme: {
         extend: {
             fontFamily: {

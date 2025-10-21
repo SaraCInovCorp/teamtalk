@@ -8,6 +8,6 @@ class ChatDashboard extends Component
 {
     public function render()
     {
-        return view('livewire.chat-dashboard');
+        return view('livewire.chat-dashboard')->layout('layouts.app');
     }
 }

@@ -234,7 +234,7 @@ class ChatContacts extends Component
             'acceptedContacts',
             'pendingContacts',
             'incomingInvites'
-        ));
+        ))->layout('layouts.app');
     }
 
 

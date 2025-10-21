@@ -48,7 +48,7 @@ class User extends Authenticatable
     public function rooms()
     {
         return $this->belongsToMany(Room::class)
-            ->withPivot('role_in_room', 'joined_at')
+            ->withPivot('role_in_room', 'joined_at', 'blocked')
             ->withTimestamps();
     }
 
@@ -94,6 +94,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Contact::class, 'contact_id');
     }
-
 
 }

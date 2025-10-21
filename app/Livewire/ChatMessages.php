@@ -73,6 +73,6 @@ class ChatMessages extends Component
     {
         return view('livewire.chat-messages', [
         'messages' => $this->messages,
-    ]);
+    ])->layout('layouts.chat-layout');
     }
 }

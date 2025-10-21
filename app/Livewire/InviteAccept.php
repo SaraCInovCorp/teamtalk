@@ -43,7 +43,7 @@ class InviteAccept extends Component
 
     public function render()
     {
-        return view('livewire.invite-accept');
+        return view('livewire.invite-accept')->layout('layouts.app-layout');
     }
 
 }

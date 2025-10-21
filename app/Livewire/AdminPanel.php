@@ -11,6 +11,6 @@ class AdminPanel extends Component
     {
         $rooms = Room::with('users')->get();
 
-        return view('livewire.admin-panel', compact('rooms'));
+        return view('livewire.admin-panel', compact('rooms'))->layout('layouts.app');;
     }
 }

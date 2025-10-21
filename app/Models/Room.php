@@ -27,7 +27,7 @@ class Room extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)
-                    ->withPivot('role_in_room', 'joined_at')
+                    ->withPivot('role_in_room', 'joined_at', 'blocked')
                     ->withTimestamps();
     }
 
