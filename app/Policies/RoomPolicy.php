@@ -45,7 +45,12 @@ class RoomPolicy
      */
     public function delete(User $user, Room $room): bool
     {
-        return $user->isAdmin();
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $user->id === $room->created_by || 
+            $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists();
     }
 
     /**
@@ -69,14 +74,20 @@ class RoomPolicy
         return $user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists();
     }
 
-    public function editDescription(User $user, Room $room): bool
+    public function editInfo(User $user, Room $room): bool
     {
-        if (!($user->isAdmin() || $room->users()->where('user_id', $user->id)->wherePivot('role_in_room', 'admin')->exists())) {
-            return false;
+        if ($user->isAdmin()) {
+            return $room->allow_edit_description;
         }
 
-        return $room->allow_edit_description;
+        $pivot = $room->users()->where('user_id', $user->id)->first()?->pivot;
+        if ($pivot && !$pivot->blocked && $pivot->role_in_room === 'admin') {
+            return $room->allow_edit_description;
+        }
+
+        return false;
     }
+
 
     public function attachFiles(User $user, Room $room): bool
     {
@@ -95,4 +106,11 @@ class RoomPolicy
 
         return $room->allow_send_messages;
     }
+
+    public function leave(User $user, Room $room): bool
+    {
+        $pivot = $room->users()->where('user_id', $user->id)->first()?->pivot;
+        return $pivot !== null;
+    }
+
 }

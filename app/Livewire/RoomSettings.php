@@ -8,6 +8,10 @@ use Livewire\WithFileUploads;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Contact;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InviteContactMail;
+
 
 class RoomSettings extends Component
 {
@@ -66,14 +70,26 @@ class RoomSettings extends Component
 
     }
 
-
     public function addSelectedMembers()
     {
+        $user = Auth::user();
+
+        $isAdminGlobal = $user->isAdmin();
+        $isAdminRoom = $this->room->users()
+                        ->where('user_id', $user->id)
+                        ->wherePivot('role_in_room', 'admin')
+                        ->exists();
+
+        if (!($isAdminGlobal || $isAdminRoom)) {
+            session()->flash('error', 'Apenas admins podem adicionar membros.');
+            return;
+        }
+
         $alreadyMembers = $this->room->users->pluck('id')->toArray();
 
         $newMembers = array_diff($this->selectedMembers, $alreadyMembers);
 
-        if(empty($newMembers)){
+        if (empty($newMembers)) {
             session()->flash('message', 'Nenhum novo membro selecionado.');
             return;
         }
@@ -92,10 +108,8 @@ class RoomSettings extends Component
     public function blockMember($userId)
     {
         $this->room->users()->updateExistingPivot($userId, ['blocked' => true]);
-
         $this->room->load('users');
         $this->users = $this->room->users;
-
         session()->flash('message', 'Membro bloqueado com sucesso!');
     }
 
@@ -132,35 +146,76 @@ class RoomSettings extends Component
 
     public function addMember()
     {
+        $user = Auth::user();
+
+        $isAdminGlobal = $user->isAdmin();
+        $isAdminRoom = $this->room->users()
+                        ->where('user_id', $user->id)
+                        ->wherePivot('role_in_room', 'admin')
+                        ->exists();
+
+        if (!($isAdminGlobal || $isAdminRoom)) {
+            session()->flash('error', 'Apenas admins podem adicionar membros.');
+            return;
+        }
+
         $this->validate([
             'newMemberEmail' => 'required|email|exists:users,email', 
         ]);
 
-        $user = User::where('email', $this->newMemberEmail)->first();
+        $userToAdd = User::where('email', $this->newMemberEmail)->first();
 
-        if (!$user) {
+        if (!$userToAdd) {
             session()->flash('message', 'Usuário não encontrado.');
             return;
         }
 
-        if ($this->room->users()->where('user_id', $user->id)->exists()) {
+        if ($this->room->users()->where('user_id', $userToAdd->id)->exists()) {
             session()->flash('message', 'Usuário já é membro da sala.');
             return;
         }
 
-        // Adiciona o membro
-        $this->room->users()->attach($user->id, ['joined_at' => now()]);
+        $contactExists = Contact::where(function ($query) use ($userToAdd) {
+            $query->where('user_id', Auth::id())
+                ->where('contact_id', $userToAdd->id);
+        })->orWhere(function ($query) use ($userToAdd) {
+            $query->where('user_id', $userToAdd->id)
+                ->where('contact_id', Auth::id());
+        })->where('status', 'accepted')->exists();
 
-        // Atualiza a lista de usuários
+        if (!$contactExists) {
+            $contact = Contact::create([
+                'user_id' => Auth::id(),
+                'contact_id' => $userToAdd->id,
+                'status' => 'pending', 
+                'token' => Str::random(64),
+            ]);
+
+            Mail::to($this->newMemberEmail)->send(new InviteContactMail($contact->token));
+        }
+
+        $this->room->users()->attach($userToAdd->id, ['joined_at' => now()]);
+
+        $this->reset('newMemberEmail');
+
         $this->room->load('users');
         $this->users = $this->room->users;
 
-        // Limpa o campo
-        $this->newMemberEmail = '';
-
-        session()->flash('message', 'Membro adicionado com sucesso!');
+        session()->flash('message', 'Membro adicionado com sucesso e convite enviado se necessário!');
     }
 
+
+    public function deleteRoom()
+    {
+        $this->authorize('delete', $this->room);
+
+        $this->room->is_active = false;
+        $this->room->save();
+
+        session()->flash('message', 'Sala removida com sucesso!');
+        
+        return redirect()->route('chat.rooms'); 
+    }
 
 
     public function save()
@@ -190,7 +245,8 @@ class RoomSettings extends Component
     }
 
    public function render()
-    {
+    {        
+        $this->room->load('users');
         return view('livewire.room-settings', [
             'room' => $this->room,
             'users' => $this->users,

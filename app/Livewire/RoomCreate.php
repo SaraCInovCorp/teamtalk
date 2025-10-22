@@ -19,6 +19,7 @@ class RoomCreate extends Component
     public $allow_edit_description = true;
     public $allow_send_messages = true;
     public $message_delete_days = null;
+    public $is_active = true;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -29,6 +30,7 @@ class RoomCreate extends Component
         'allow_edit_description' => 'boolean',
         'allow_send_messages' => 'boolean',
         'message_delete_days' => 'nullable|integer|min:0',
+        'is_active' => 'boolean',
     ];
 
     public function save()
@@ -47,6 +49,7 @@ class RoomCreate extends Component
             'allow_edit_description' => $this->allow_edit_description,
             'allow_send_messages' => $this->allow_send_messages,
             'message_delete_days' => $this->message_delete_days ?? 0,
+            'is_active' => true,
         ]);
 
         $room->users()->attach(Auth::id(), [

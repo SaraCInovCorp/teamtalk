@@ -22,6 +22,7 @@ class Room extends Model
         'allow_edit_description',
         'allow_send_messages',
         'message_delete_days',
+        'is_active',
     ];
 
     public function users()
