@@ -75,8 +75,9 @@
                 <ul>
                     @foreach ($room->users as $member)
                         @php
-                            $isBlocked = $member->pivot->blocked ?? false;
-                            $isAdmin = ($member->pivot->role_in_room === 'admin');
+                            $pivot = $member->pivot;
+                            $isBlocked = $pivot && $pivot->blocked;
+                            $isAdmin = $pivot && $pivot->role_in_room === 'admin';
                         @endphp
 
                         <li class="flex justify-between items-center py-1">

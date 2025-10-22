@@ -72,6 +72,8 @@ class RoomSettings extends Component
 
     public function addSelectedMembers()
     {
+        $this->checkIfBlocked();
+
         $user = Auth::user();
 
         $isAdminGlobal = $user->isAdmin();
@@ -107,6 +109,8 @@ class RoomSettings extends Component
 
     public function blockMember($userId)
     {
+        $this->checkIfBlocked();
+
         $this->room->users()->updateExistingPivot($userId, ['blocked' => true]);
         $this->room->load('users');
         $this->users = $this->room->users;
@@ -115,6 +119,8 @@ class RoomSettings extends Component
 
     public function unblockMember($userId)
     {
+        $this->checkIfBlocked();
+
         $this->room->users()->updateExistingPivot($userId, ['blocked' => false]);
         $this->room->load('users');
         $this->users = $this->room->users;
@@ -123,6 +129,8 @@ class RoomSettings extends Component
 
     public function removeMember($userId)
     {
+        $this->checkIfBlocked();
+
         $this->room->users()->detach($userId);
         $this->room->load('users');
         $this->users = $this->room->users;
@@ -131,6 +139,8 @@ class RoomSettings extends Component
 
     public function toggleAdmin($userId)
     {
+        $this->checkIfBlocked();
+
         $currentRole = $this->room->users()->where('user_id', $userId)->first()->pivot->role_in_room ?? 'user';
 
         $newRole = $currentRole === 'admin' ? 'user' : 'admin';
@@ -146,6 +156,8 @@ class RoomSettings extends Component
 
     public function addMember()
     {
+        $this->checkIfBlocked();
+
         $user = Auth::user();
 
         $isAdminGlobal = $user->isAdmin();
@@ -220,6 +232,7 @@ class RoomSettings extends Component
 
     public function save()
     {
+        $this->checkIfBlocked();
         $this->validate();
 
         $room = Room::findOrFail($this->roomId);
@@ -244,7 +257,15 @@ class RoomSettings extends Component
         $this->users = $this->room->users;
     }
 
-   public function render()
+    private function checkIfBlocked()
+    {
+        $pivot = $this->room->users()->where('user_id', Auth::id())->first()?->pivot;
+        if ($pivot && $pivot->blocked) {
+            abort(403, 'Você está bloqueado nesta sala.');
+        }
+    }
+
+    public function render()
     {        
         $this->room->load('users');
         return view('livewire.room-settings', [

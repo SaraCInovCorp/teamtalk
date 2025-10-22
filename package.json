@@ -21,6 +21,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
-        "daisyui": "^5.2.3"
+        "daisyui": "^5.2.3",
+        "emoji-picker-element": "^1.27.0"
     }
 }

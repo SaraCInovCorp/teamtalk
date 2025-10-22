@@ -107,6 +107,22 @@ class RoomPolicy
         return $room->allow_send_messages;
     }
 
+    public function before(User $user, $room = null)
+    {
+        if (! $room instanceof Room) {
+            return null; 
+        }
+
+        $pivot = $room->users()->where('user_id', $user->id)->first()?->pivot;
+
+        if ($pivot && $pivot->blocked) {
+            return false; 
+        }
+
+        return null; 
+    }
+
+
     public function leave(User $user, Room $room): bool
     {
         $pivot = $room->users()->where('user_id', $user->id)->first()?->pivot;
