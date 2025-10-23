@@ -15,7 +15,10 @@ class ChatContacts extends Component
 {
     use WithPagination;
 
-    protected $listeners = ['refresh' => '$refresh'];
+    protected $listeners = [
+        'refresh' => '$refresh',
+        'contactsShouldRefresh' => 'loadRecentContacts',
+    ];
 
     public $emailToInvite;
     public $search = '';
@@ -67,10 +70,25 @@ class ChatContacts extends Component
     }
 
 
-    public function startPrivateChat($id)
+    public function startPrivateChat($contactId)
     {
-        $this->dispatchBrowserEvent('start-private-chat', ['contactId' => $id]);
+        
+        $contact = Contact::findOrFail($contactId);
+
+        $user = Auth::user();
+       
+        $otherUser = $contact->user_id === $user->id
+            ? $contact->contactUser
+            : $contact->user;
+
+        if (!$otherUser) {
+            session()->flash('message', 'Este usuário não está registrado no sistema.');
+            return;
+        }
+
+        return redirect()->route('chat.messages.private', ['recipient' => $otherUser->id]);
     }
+
 
     public function acceptInvite($inviteId)
     {

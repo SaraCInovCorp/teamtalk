@@ -28,6 +28,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('chat/salas/{room}/config', RoomSettings::class)->name('chat.room.settings');
     Route::get('chat/salas/{room?}', ChatMessages::class)->name('chat.room');
 
+    Route::get('/chat/privado/{recipient}', ChatMessages::class)->name('chat.messages.private');
+
+
     Route::get('chat/contatos', ChatContacts::class)->name('chat.contacts');
     Route::get('chat/contatos/convidar', fn() => view('chat.invite-contact'))->name('chat.invite');
 

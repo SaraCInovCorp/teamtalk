@@ -34,7 +34,21 @@
             @endif
 
             <main class="flex-1 overflow-auto p-6 bg-gray-50">
-                {{ $slot }}
+
+            {{ $slot }}
+                
+                  <!-- @if (isset($room))
+                    <livewire:chat-messages :room="$room" />
+                    {{ $slot ?? '' }}
+                @elseif (isset($recipient))
+                    <livewire:chat-messages :recipient="$recipient" />
+                    {{ $slot ?? '' }}
+                @else
+                    <div class="text-center text-gray-500 mt-10">
+                        <p>Selecione uma sala ou contato para iniciar o chat.</p>
+                    </div>
+                @endif -->
+                
             </main>
         </div>
     </div>
@@ -44,6 +58,9 @@
 
     @livewireScripts
     @stack('scripts')
+    
+
+
 
 </body>
 </html>

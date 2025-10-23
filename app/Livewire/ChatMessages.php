@@ -4,11 +4,11 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Message;
-use App\Events\MessageSent;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Room;
+use App\Models\HiddenPrivateChat;
+use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
-
+use App\Events\MessageSent;
 
 class ChatMessages extends Component
 {
@@ -17,34 +17,90 @@ class ChatMessages extends Component
     public $messageText = '';
     public $attachment = null;
     public $roomId = null;
-    public $recipientId = null; 
+    public $recipientId = null;
+    public int $recentContactsVersion = 0;
+
+    protected $messages = [];
+
+    protected $rules = [
+        'messageText' => 'nullable|string|max:1000',
+        'attachment' => 'nullable|file|max:10240',
+    ];
 
     protected $listeners = [
         'addEmoji' => 'addEmojiToMessageText',
         'syncInput' => 'syncInputValue',
-        'echo:chat.room.*,MessageSent' => 'handleNewMessage',
-        'echo-private:chat.user.*,MessageSent' => 'handleNewMessage',
-        'refreshMessages' => '$refresh',
+        'refreshMessages' => 'refreshMessagesList',
     ];
 
-    protected $rules = [
-        'messageText' => 'required_without:attachment|string|max:1000',
-        'attachment' => 'nullable|file|max:10240',
-    ];
-
-    public function syncInputValue($value)
+    public function mount($room = null, $recipient = null)
     {
-        $this->messageText = $value;
+        $this->roomId = $room;
+        $this->recipientId = $recipient;
+        $this->loadMessages();
     }
 
-    public function addEmojiToMessageText($emoji)
+    public function updatedRoomId($value)
     {
-        $this->messageText .= $emoji;
+        $this->messageText = '';
+        $this->attachment = null;
+        $this->loadMessages();
+    }
+
+    protected function loadMessages()
+    {
+        if ($this->roomId) {
+            $room = Room::find($this->roomId);
+
+            if (!$room) {
+                $this->messages = [];
+                return;
+            }
+
+            $this->messages = Message::with('sender')
+                ->where('room_id', $this->roomId)
+                ->where('is_active', true)
+                ->latest()
+                ->take(100)
+                ->get()
+                ->reverse()
+                ->values(); 
+
+        } elseif ($this->recipientId) {
+            $this->messages = Message::with('sender')
+                ->where(function ($q) {
+                    $q->where([
+                        ['sender_id', Auth::id()],
+                        ['recipient_id', $this->recipientId],
+                    ])->orWhere(function ($subQ) {
+                        $subQ->where('sender_id', $this->recipientId)
+                            ->where('recipient_id', Auth::id());
+                    });
+                })
+                ->where('is_active', true)
+                ->latest()
+                ->take(100)
+                ->get()
+                ->reverse()
+                ->values();
+
+        } else {
+            $this->messages = [];
+        }
+    }
+
+    public function refreshMessagesList()
+    {
+        $this->loadMessages();
     }
 
     public function sendMessage()
     {
         $this->validate();
+
+        if (empty($this->messageText) && !$this->attachment) {
+            return;
+        }
 
         $attachmentPath = null;
         if ($this->attachment) {
@@ -59,80 +115,47 @@ class ChatMessages extends Component
             'attachment' => $attachmentPath,
         ]);
 
+        if ($this->recipientId) {
+            HiddenPrivateChat::where('user_id', Auth::id())
+                ->where('contact_id', $this->recipientId)
+                ->delete();
+        }
+
         broadcast(new MessageSent($message))->toOthers();
-        \Log::info('Mensagem criada: ', ['message_id' => $message->id]);
 
         $this->messageText = '';
-        $this->attachment = null;  
+        $this->attachment = null;
+
+        $this->loadMessages();
+        
     }
 
-    public function handleNewMessage($payload)
+    public function addEmojiToMessageText($emoji)
     {
-        $this->emitSelf('$refresh');
+        $this->messageText .= $emoji;
     }
 
-    public function getMessagesProperty()
+    public function syncInputValue($value)
     {
-        $pivot = Room::find($this->roomId)
-            ->users()
-            ->where('user_id', Auth::id())
-            ->first()
-            ?->pivot;
-
-        if ($pivot && $pivot->blocked) {
-            return collect(); 
-        }
-
-        return Message::with('sender')
-            ->where('room_id', $this->roomId)
-            ->latest()
-            ->get()
-            ->reverse();
-    }
-
-   public function mount($room = null, $recipientId = null)
-    {
-        $this->roomId = $room;
-
-        if (!$this->roomId && !$this->recipientId) {
-            $lastRoom = Auth::user()->rooms()->latest()->first();
-            $this->roomId = $lastRoom?->id;
-        }
-    }
-
-
-
-    public function updatedRoomId($value)
-    {
-        $this->reset('messageText', 'attachment');
-        $this->emitSelf('$refresh'); 
-    }
-
-    public function leaveRoom()
-    {
-        $user = Auth::user();
-        $room = Room::find($this->roomId);
-
-        if ($room && $user) {
-            
-            $room->users()->detach($user->id);
-            $this->roomId = null;
-            $this->dispatch('refreshRooms');
-            session()->flash('message', 'Você saiu da sala com sucesso.');
-        }
-
-        return redirect()->route('chat.rooms');
+        $this->messageText = $value;
     }
 
     public function render()
     {
-        \Log::info('RoomId:', ['roomId' => $this->roomId]);
+        $room = null;
 
-        $room = Room::find($this->roomId); 
+        if ($this->roomId) {
+            $roomModel = Room::find($this->roomId);
+            if ($roomModel) {
+                $room = $roomModel;
+            } else {
+                $this->roomId = null;
+            }
+        }
 
         return view('livewire.chat-messages', [
-            'messages' => $this->messages,
-            'room' => $room, 
+            'messages' => $this->messages, 
+            'room' => $room,
         ])->layout('layouts.chat-layout');
     }
 

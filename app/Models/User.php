@@ -10,6 +10,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Room;
 use App\Models\Message;
+use App\Models\HiddenPrivateChat;
 
 class User extends Authenticatable
 {
@@ -50,6 +51,21 @@ class User extends Authenticatable
         return $this->belongsToMany(Room::class)
             ->withPivot('role_in_room', 'joined_at', 'blocked')
             ->withTimestamps();
+    }
+
+    public function recentPrivateContacts($limit = 10)
+    {
+        return Message::where(function($q){
+                $q->where('sender_id', $this->id)
+                  ->orWhere('recipient_id', $this->id);
+            })
+            ->whereNotNull('recipient_id')
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->pluck('recipient_id')
+            ->unique()
+            ->map(fn($id) => User::find($id));
     }
 
     public function sentMessages()
@@ -93,6 +109,21 @@ class User extends Authenticatable
     public function incomingContacts()
     {
         return $this->hasMany(Contact::class, 'contact_id');
+    }
+
+    public function isMessageTemporariesEnabled()
+    {
+        return $this->has_temporary_messages;
+    }
+
+    public function messageExpiryDays()
+    {
+        return $this->private_message_expire_days;
+    }
+
+    public function hiddenPrivateChats()
+    {
+        return $this->hasMany(HiddenPrivateChat::class, 'user_id');
     }
 
 }
