@@ -32,6 +32,12 @@
 
     @stack('modals')
     @livewireScripts
+    <script>
+    if (typeof Alpine !== 'undefined' && typeof Alpine.navigate === 'undefined') {
+        Alpine.navigate = () => {}; // Corrige a ausência do método e evita erro
+    }
+</script>
+
 
     <script>
         document.addEventListener('livewire:init', () => {

@@ -8,6 +8,8 @@ use App\Livewire\ChatMessages;
 use App\Livewire\RoomSettings;
 use App\Livewire\ChatContacts;
 use App\Livewire\AdminPanel;
+use App\Livewire\UserProfileAdmin;
+
 
 // Páginas públicas
 Route::view('/', 'welcome')->name('home');
@@ -34,6 +36,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('chat/contatos', ChatContacts::class)->name('chat.contacts');
     Route::get('chat/contatos/convidar', fn() => view('chat.invite-contact'))->name('chat.invite');
 
-    Route::get('chat/admin', AdminPanel::class)->middleware('can:admin')->name('chat.admin');
+    Route::get('chat/admin', AdminPanel::class)->name('chat.admin');
+    Route::get('chat/admin/usuarios/{id}', UserProfileAdmin::class)->name('user.profile.admin');
 
 });

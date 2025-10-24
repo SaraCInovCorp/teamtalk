@@ -85,9 +85,15 @@
         <!-- Bio -->
         <div class="col-span-6 sm:col-span-4">
             <x-label for="bio" value="{{ __('Bio') }}" />
-            <x-textarea id="bio" class="mt-1 block w-full" wire:model="state.bio" rows="3"></x-textarea>
+            <textarea
+                id="bio"
+                class="textarea textarea-xs sm:textarea-sm md:textarea-md lg:textarea-lg xl:textarea-xl mt-1 block w-full"
+                wire:model="state.bio"
+                rows="3"
+            ></textarea>
             <x-input-error for="bio" class="mt-2" />
         </div>
+
 
         <!-- Status Message -->
         <div class="col-span-6 sm:col-span-4">
