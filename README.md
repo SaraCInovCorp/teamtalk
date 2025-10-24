@@ -41,6 +41,42 @@ O TeamTalk possui um sistema avançado de contatos e convites, com os seguintes 
 
 ---
 
+---
+
+## Funcionalidades do chat
+
+### Sistema de Salas (Rooms)
+
+O TeamTalk inclui um sistema completo de gerenciamento de salas de chat para colaboração em grupo:
+
+- Usuários podem criar salas com nome e avatar personalizado.
+- Cada sala tem um criador (usuário administrador da sala) e pode ter múltiplos membros.
+- Relação muitos-para-muitos entre usuários e salas registradas na tabela `room_user`.
+- Distinção de privilégios entre membros e administradores da sala, definindo papéis e permissões.
+- Controle de acesso rigoroso com validação para impedir acesso de usuários bloqueados.
+- Mensagens em salas são públicas aos membros da sala, com suporte a anexos e emojis.
+- Implementação robusta para gerenciamento de entrada/saída dos usuários às salas, incluindo ações administrativas (promover, remover).
+- Atualização dinâmica das mensagens em tempo real via broadcasting e Livewire.
+- Permissões são configuradas para permitir/negаr ações como enviar mensagens, adicionar anexos, alterar configurações da sala e mais.
+- Rotas dedicadas para criação, configuração e acesso direto às salas.
+- Salas são visíveis apenas a usuários participantes ou administradores, com status ativo para controle.
+- Logs de atividade são mantidos para auditoria e histórico das ações dentro das salas.
+
+
+### Chat Privado e Mensagens em Tempo Real
+
+O TeamTalk oferece um sistema robusto de chat privado, incluindo:
+
+- Mensagens privadas entre usuários (usando o campo `recipient_id` em `messages`).
+- Suporte a anexos em mensagens privadas e de grupo.
+- Histórico de mensagens organizado, ordenação pela última mensagem (funciona em SQLite, MySQL e outros bancos).
+- Sistema automatizado para remoção/expiração de mensagens temporárias conforme preferências do usuário (flag e dias configuráveis em `users`).
+- Bloqueio de contatos com mantimento de histórico, sem recarregar contatos ocultos.
+- Exibição e ocultação de conversas recentes sem perder histórico, com contato oculto armazenado em tabela específica (`hidden_private_chats`).
+- Cada mensagem suporta textos, arquivos e emojis.
+
+---
+
 ## Estrutura do Banco de Dados
 
 ### Tabelas principais
@@ -66,6 +102,12 @@ O TeamTalk possui um sistema avançado de contatos e convites, com os seguintes 
 - Mensagens privadas e de grupo coexistem.
 - Logs de atividades via **Spatie Activity Log** registram eventos importantes.
 - Sistema de contatos gerenciado por Livewire, com separação entre convites recebidos, aceitos e pendentes.
+
+### Outras migrates importantes:
+
+- A tabela `hidden_private_chats` armazena contatos ocultos do usuário.
+- Os campos de flags em `users`, como `has_temporary_messages` e `private_message_expire_days`.
+- Os campos adicionais em `rooms`, como `description`, `allow_attachment`, etc.
 
 ---
 

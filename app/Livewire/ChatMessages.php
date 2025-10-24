@@ -35,6 +35,7 @@ class ChatMessages extends Component
 
     public function mount($room = null, $recipient = null)
     {
+        $this->messages = [];
         $this->roomId = $room;
         $this->recipientId = $recipient;
         $this->loadMessages();
@@ -46,6 +47,12 @@ class ChatMessages extends Component
         $this->attachment = null;
         $this->loadMessages();
     }
+
+    public function updatedAttachment()
+    {
+        $this->loadMessages();
+    }
+
 
     protected function loadMessages()
     {
@@ -122,11 +129,13 @@ class ChatMessages extends Component
         }
 
         broadcast(new MessageSent($message))->toOthers();
+        $this->dispatch('recentContactsUpdated');
 
         $this->messageText = '';
         $this->attachment = null;
 
         $this->loadMessages();
+        $this->dispatch('clearMessageInputs');
         
     }
 

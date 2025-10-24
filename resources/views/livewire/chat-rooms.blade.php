@@ -5,9 +5,21 @@
 
     <ul class="divide-y">
         @foreach ($rooms as $room)
-            <li class="flex justify-between items-center py-3">
-                <div>
-                    <a href="{{ route('chat.room', $room->id) }}" class="text-blue-700 hover:underline">
+            @php
+            $isActive = isset($roomId) && $roomId == $room->id;
+        @endphp
+            <li class="flex justify-between items-center p-2  {{ $isActive ? 'bg-gray-200 font-bold' : '' }}">
+                <div class="flex items-center gap-2">
+                    @if($room->avatar)
+                        <img 
+                            src="{{ asset('storage/' . $room->avatar) }}" 
+                            alt="Avatar sala {{ $room->name }}" 
+                            class="w-10 h-10 rounded-full object-cover border" />
+                    @else
+                        <!-- Avatar padrão -->
+                        <div class="w-10 h-10 rounded-full bg-teamtalk-gray text-white flex items-center justify-center font-bold">{{ Str::substr($room->name,0,1) }}</div>
+                    @endif
+                    <a href="{{ route('chat.room', $room->id)  }}" class="text-teamtalk-blue hover:text-teamtalk-blue-claro">
                         {{ $room->name }}
                     </a>
                 </div>
@@ -38,11 +50,27 @@
         @else
             <ul>
                 @foreach ($recentContacts as $contact)
-                    <li class="flex justify-between items-center py-2">
-                        <a href="{{ route('chat.messages.private', ['recipient' => $contact->id]) }}" class="text-teamtalk-blue hover:text-teamtalk-blue-claro">
-                            {{ $contact->name }}
-                        </a>
+                   @php
+                        $isActive = isset($selectedContactId) && $selectedContactId == $contact->id;
+                    @endphp
 
+                    <li class="flex justify-between items-center p-2 {{ $isActive ? 'bg-gray-200 font-bold' : '' }}">
+                        <div class="flex items-center gap-2">
+                            @if($contact->profile_photo_path)
+                                <img 
+                                    src="{{ asset('storage/' . $contact->profile_photo_path) }}" 
+                                    alt="Avatar {{ $contact->name }}" 
+                                    class="w-8 h-8 rounded-full object-cover border" />
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-teamtalk-gray text-white flex items-center justify-center font-bold">
+                                    {{ Str::substr($contact->name, 0, 1) }}
+                                </div>
+                            @endif
+                            <a href="{{ route('chat.messages.private', ['recipient' => $contact->id]) }}" class="text-teamtalk-blue hover:text-teamtalk-blue-claro">
+                                {{ $contact->name }}
+                            </a>
+
+                        </div>
                         <x-icon wire:click.prevent="hideRecentContact({{ $contact->id }})" class="text-teamtalk-orange ">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />

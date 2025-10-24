@@ -35,7 +35,13 @@
 
             <main class="flex-1 overflow-auto p-6 bg-gray-50">
 
-            {{ $slot }}
+            @if (request()->routeIs('chat.rooms')) 
+                <div class="text-center text-gray-500 mt-10">
+                    <p>{{ __('Selecione uma sala ou contato para iniciar o chat.') }}</p>
+                </div>
+            @else
+                {{ $slot }}
+            @endif
                 
                   <!-- @if (isset($room))
                     <livewire:chat-messages :room="$room" />

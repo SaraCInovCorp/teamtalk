@@ -92,6 +92,12 @@
                     }
                 });
 
+                Livewire.on('clearMessageInputs', () => {
+                    document.getElementById('messageTextid').value = '';
+                    const fileInput = document.querySelector('input[type="file"][wire\\:model="attachment"]');
+                    if (fileInput) fileInput.value = '';
+                });
+
             });
         </script>
     </div>

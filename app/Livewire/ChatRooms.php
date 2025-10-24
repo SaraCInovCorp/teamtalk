@@ -14,6 +14,7 @@ class ChatRooms extends Component
     public $roomId;
     public $recentContacts;
     public int $recentContactsVersion = 0;
+    public $selectedContactId = null;
 
 
     protected $listeners = [
@@ -98,6 +99,12 @@ class ChatRooms extends Component
         $this->loadRecentContacts(); 
     }
 
+    
+
+    public function selectContact($contactId)
+    {
+        $this->selectedContactId = $contactId;
+    }
 
     public function render()
     {

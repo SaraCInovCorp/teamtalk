@@ -27,21 +27,24 @@
                     <x-button type="submit" class="bg-blue-600 text-white w-full">
                         Enviar convite
                     </x-button>
+
+                    <x-secondary-button wire:click="hideInviteForm" >
+                        Voltar
+                    </x-secondary-button>
                 </form>
 
-                <x-secondary-button wire:click="$set('showInviteForm', false)" class="mt-4 w-full">
-                    Voltar
-                </x-secondary-button>
+                
+
             </div>
         @else
             <!-- Filtros -->
             <div class="flex flex-wrap gap-2 mb-4">
                 @foreach(range('A', 'Z') as $l)
-                    <x-button 
+                    <button 
                         wire:click="$set('letter', '{{ $l }}')" 
-                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-white text-teamtalk-gray hover:text-white' }}">
+                        class="w-10 h-10 flex items-center justify-center border rounded {{ $letter === $l ? ' bg-teamtalk-blue-claro text-white' : 'bg-teamtalk-gray text-white hover:bg-teamtalk-blue  hover:text-white' }}">
                         {{ $l }}
-                    </x-button>
+                    </button>
                 @endforeach
                 <x-secondary-button wire:click="$set('letter', null)">Todos</x-secondary-button>
             </div>
@@ -54,12 +57,16 @@
                         wire:model="search" 
                         class="input input-bordered w-full" 
                         placeholder="Pesquisar contatos..."
+                        id="search"
                     />
                 </div>
             
             <x-button type="submit" class="mt-2">
                 Buscar
             </x-button>
+            <x-secondary-button type="button" wire:click="clearFilters">
+                Limpar filtros
+            </x-secondary-button>
             </form>
 
             <!-- Convites Recebidos -->
@@ -149,3 +156,11 @@
         @endif
     </div>
 </div>
+@script
+<script>
+    $wire.on('clearFilters', () => {
+        console.log('entrou');
+        document.getElementById('search').value='';
+    });
+</script>
+@endscript

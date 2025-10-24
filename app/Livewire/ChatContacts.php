@@ -134,6 +134,19 @@ class ChatContacts extends Component
         }
     }
 
+    public function clearFilters()
+    {
+
+       $this->reset(['search', 'letter']);
+       $this->resetPage(); 
+       $this->dispatch('clearFilters');
+    }
+
+    public function hideInviteForm()
+    {
+        $this->showInviteForm = false;
+    }
+
     public function render()
     {
         $user = Auth::user();
